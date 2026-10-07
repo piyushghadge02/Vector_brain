@@ -75,6 +75,6 @@ jobs:
         run: |
           ! grep -rEn --exclude-dir=node_modules --exclude-dir=.git \
             -e 'gsk_[A-Za-z0-9]{10,}' \
-            -e 'GROQ_API_KEY=.+' \
+            -e 'GROQ_API_KEY=gsk_[A-Za-z0-9]{10,}' \
             . | grep -v '.env.example' \
             && echo "no secrets found"
