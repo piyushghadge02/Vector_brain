@@ -1,7 +1,7 @@
 # ── VectorBrain production override ──────────────────────────────────
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 # Set real secrets via environment (never in this file):
-#   GROQ_API_KEY=<redacted>  docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+#   GROQ_API_KEY=${GROQ_API_KEY}  docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 #
 # What this override changes vs. the dev file:
 # - backend runs with 2 uvicorn workers, no --reload, ENV=prod (JSON logs,

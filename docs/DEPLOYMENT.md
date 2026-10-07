@@ -20,12 +20,12 @@ git clone <your-repo-url> vectorbrain && cd vectorbrain
 
 # 2. Generate secrets (never reuse dev defaults)
 export POSTGRES_PASSWORD=$(openssl rand -hex 24)
-export GROQ_API_KEY=<redacted>
+export GROQ_API_KEY=${GROQ_API_KEY}
 
 # 3. Build and start (prod override: 2 uvicorn workers, ENV=prod,
 #    only port 80 published, uploads on a persistent volume)
 POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-GROQ_API_KEY=<redacted> \
+GROQ_API_KEY=${GROQ_API_KEY} \
   docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
 
