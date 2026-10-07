@@ -1,0 +1,4 @@
+# Test-only dependencies (fixtures that generate sample PDFs).
+# Install after requirements.txt:  pip install -r requirements-test.txt
+-r requirements.txt
+reportlab>=5.0,<6

@@ -1,0 +1,32 @@
+# ── Runtime ──────────────────────────────────────────────────────────
+fastapi>=0.115,<0.117
+uvicorn[standard]>=0.30,<0.35
+pydantic>=2.7,<3
+pydantic-settings>=2.3,<3
+sqlalchemy[asyncio]>=2.0,<2.1
+asyncpg>=0.29,<0.31
+alembic>=1.13,<2
+pgvector>=0.3,<0.4
+anyio>=4.0,<5
+python-multipart>=0.0.18,<0.0.20
+slowapi>=0.1.9,<0.2
+
+# ── Phase 3: ingestion (Docling + embeddings) ─────────────────────────
+# CPU-only torch/torchvision: installed from the PyTorch CPU index.
+# The default PyPI torch bundles CUDA (~2 GB) and its torchvision build
+# is ABI-incompatible with CPU torch — do NOT install torch from PyPI.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.8.0+cpu
+torchvision==0.23.0+cpu
+docling>=2.130,<3
+sentence-transformers>=6.0,<7
+transformers>=5.0,<6
+pypdf>=6.0,<7
+# Optional: ONNX Runtime for faster Docling layout model inference on CPU
+onnxruntime>=1.18,<2
+
+# ── Dev / test ───────────────────────────────────────────────────────
+pytest>=8.0,<9
+pytest-asyncio>=0.23,<0.25
+httpx>=0.27,<0.29
+ruff>=0.5,<0.6

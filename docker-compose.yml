@@ -1,0 +1,98 @@
+# ─── VectorBrain local development ───────────────────────────────────────────
+# One command:
+#   docker compose up --build
+#
+# frontend → http://localhost:5173
+# backend  → http://localhost:8000
+# backend docs → http://localhost:8000/docs
+# postgres → localhost:5432
+#
+# Run migrations once:
+#   docker compose exec backend alembic upgrade head
+
+services:
+
+  # ─── PostgreSQL + pgvector ────────────────────────────────────────────────
+  db:
+    image: pgvector/pgvector:pg16
+
+    environment:
+      POSTGRES_USER: vectorbrain
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vectorbrain}
+      POSTGRES_DB: vectorbrain
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vectorbrain -d vectorbrain"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+
+  # ─── FastAPI backend ─────────────────────────────────────────────────────
+  backend:
+    build: ./backend
+
+    # Loads GROQ_API_KEY and the other backend settings
+    # from backend/.env
+    env_file:
+      - ./backend/.env
+
+    environment:
+      ENV: dev
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql+asyncpg://vectorbrain:${POSTGRES_PASSWORD:-vectorbrain}@db:5432/vectorbrain
+      CORS_ORIGINS: '["http://localhost:5173"]'
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./backend/app:/app/app
+      - uploads:/data/uploads
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+
+  # ─── React/Vite frontend ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    depends_on:
+      - backend
+
+
+# ─── Persistent Docker volumes ───────────────────────────────────────────────
+volumes:
+  pgdata:
+    name: vectorbrain_pgdata
+
+  uploads:
+    name: vectorbrain_uploads
+
+
+# ─── Network ─────────────────────────────────────────────────────────────────
+networks:
+  default:
+    name: vectorbrain_default
